@@ -12,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { InviteCoachDialog } from "./InviteCoachDialog";
-import LogoutButton from "@/components/AdminLogoutButton";
 import { DeleteCoachButton } from "@/components/DeleteCoachButton";
 export default async function CoachesPage() {
   // 1. Use the standard server client to check for a logged-in user

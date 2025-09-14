@@ -1,5 +1,4 @@
 // src/app/dashboard/[playerId]/page.tsx
-
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,16 +8,20 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Tables } from "@/types/supabase"; // <-- 1. Import Supabase types
+
+// 2. Define a reusable type for our questionnaire data
+type QuestionnaireResponseWithTemplate = Tables<'questionnaire_responses'> & {
+  questionnaire_templates: Tables<'questionnaire_templates'> | null;
+};
 
 // Sub-component for rendering the pending questionnaire form
-function QuestionnaireForm({ response }: { response: any }) {
-  const questions = response.questionnaire_templates.questions || [];
+function QuestionnaireForm({ response }: { response: QuestionnaireResponseWithTemplate }) { // <-- 3. Use the new type
+  const questions = (response.questionnaire_templates?.questions as string[]) || [];
   
-  // This is a Server Action that will be called on form submission.
-  // It constructs the answers array and passes it to the main submit function.
   const submitWithAnswers = async (formData: FormData) => {
     "use server";
-    const answers = questions.map((_: any, index: number) => {
+    const answers = questions.map((_, index: number) => { // Type the index
       return formData.get(`answer-${index}`) as string || '';
     });
     formData.append('answers', JSON.stringify(answers));
@@ -30,13 +33,13 @@ function QuestionnaireForm({ response }: { response: any }) {
       <CardHeader>
         <CardTitle>Pending Questionnaire</CardTitle>
         <CardDescription>
-          Please provide your feedback for the week of {new Date(response.created_at).toLocaleDateString()}.
+          Please provide your feedback for the week of {new Date(response.created_at!).toLocaleDateString()}.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={submitWithAnswers} className="space-y-4">
           <input type="hidden" name="responseId" value={response.id} />
-          <input type="hidden" name="playerId" value={response.player_id} />
+          <input type="hidden" name="playerId" value={response.player_id!} />
           {questions.map((question: string, index: number) => (
             <div key={index} className="space-y-2">
               <Label htmlFor={`answer-${index}`}>{question}</Label>
@@ -51,7 +54,7 @@ function QuestionnaireForm({ response }: { response: any }) {
 }
 
 // Sub-component for rendering the history of completed answers
-function AnswerHistory({ responses }: { responses: any[] }) {
+function AnswerHistory({ responses }: { responses: QuestionnaireResponseWithTemplate[] }) { // <-- 4. Use the new type
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-semibold mb-4">Answer History</h2>
@@ -59,14 +62,14 @@ function AnswerHistory({ responses }: { responses: any[] }) {
         {responses.map(response => (
           <AccordionItem key={response.id} value={response.id}>
             <AccordionTrigger>
-              Week of {new Date(response.created_at).toLocaleDateString()}
+              Week of {new Date(response.created_at!).toLocaleDateString()}
             </AccordionTrigger>
             <AccordionContent>
-              {response.questionnaire_templates.questions.map((q: string, i: number) => (
+              {(response.questionnaire_templates?.questions as string[]).map((q: string, i: number) => (
                 <div key={i} className="mb-4 last:mb-0">
                   <p className="font-semibold">{q}</p>
                   <p className="text-muted-foreground pl-4 border-l-2 ml-2 italic">
-                    {response.answers[i] || "No answer provided."}
+                    {(response.answers as string[])?.[i] || "No answer provided."}
                   </p>
                 </div>
               ))}
@@ -77,7 +80,6 @@ function AnswerHistory({ responses }: { responses: any[] }) {
     </div>
   );
 }
-
 // The main page component
 export default async function PlayerProfilePage({
   params: { playerId }, // Destructure playerId directly from params

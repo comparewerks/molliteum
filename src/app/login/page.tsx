@@ -59,7 +59,7 @@ export default function CoachLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="coach@example.com"
+                placeholder="coach@yourcompany.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

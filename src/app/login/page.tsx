@@ -41,7 +41,7 @@ export default function CoachLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
         <Image
-            src="/images/logo.avif"
+            src='/images/logo.avif'
             alt="Company Logo"
             width={150}
             height={50}

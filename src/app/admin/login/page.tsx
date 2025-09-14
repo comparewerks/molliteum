@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Image
-            src="/images/logo.avif" // Path to your logo
+            src='/images/logo.avif' // Path to your logo
             alt="Company Logo"
             width={150} // Adjust width as needed
             height={50} // Adjust height as needed

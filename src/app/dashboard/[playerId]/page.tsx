@@ -1,8 +1,84 @@
 // src/app/dashboard/[playerId]/page.tsx
+
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { submitQuestionnaire } from "@/app/admin/(protected)/players/actions";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 
+// Sub-component for rendering the pending questionnaire form
+function QuestionnaireForm({ response }: { response: any }) {
+  const questions = response.questionnaire_templates.questions || [];
+  
+  // This is a Server Action that will be called on form submission.
+  // It constructs the answers array and passes it to the main submit function.
+  const submitWithAnswers = async (formData: FormData) => {
+    "use server";
+    const answers = questions.map((_: any, index: number) => {
+      return formData.get(`answer-${index}`) as string || '';
+    });
+    formData.append('answers', JSON.stringify(answers));
+    return submitQuestionnaire(formData);
+  };
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle>Pending Questionnaire</CardTitle>
+        <CardDescription>
+          Please provide your feedback for the week of {new Date(response.created_at).toLocaleDateString()}.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form action={submitWithAnswers} className="space-y-4">
+          <input type="hidden" name="responseId" value={response.id} />
+          <input type="hidden" name="playerId" value={response.player_id} />
+          {questions.map((question: string, index: number) => (
+            <div key={index} className="space-y-2">
+              <Label htmlFor={`answer-${index}`}>{question}</Label>
+              <Textarea id={`answer-${index}`} name={`answer-${index}`} required />
+            </div>
+          ))}
+          <Button type="submit" className="w-full">Submit Answers</Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Sub-component for rendering the history of completed answers
+function AnswerHistory({ responses }: { responses: any[] }) {
+  return (
+    <div className="mt-8">
+      <h2 className="text-2xl font-semibold mb-4">Answer History</h2>
+      <Accordion type="single" collapsible className="w-full">
+        {responses.map(response => (
+          <AccordionItem key={response.id} value={response.id}>
+            <AccordionTrigger>
+              Week of {new Date(response.created_at).toLocaleDateString()}
+            </AccordionTrigger>
+            <AccordionContent>
+              {response.questionnaire_templates.questions.map((q: string, i: number) => (
+                <div key={i} className="mb-4 last:mb-0">
+                  <p className="font-semibold">{q}</p>
+                  <p className="text-muted-foreground pl-4 border-l-2 ml-2 italic">
+                    {response.answers[i] || "No answer provided."}
+                  </p>
+                </div>
+              ))}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  );
+}
+
+// The main page component
 export default async function PlayerProfilePage({
   params,
 }: {
@@ -16,63 +92,94 @@ export default async function PlayerProfilePage({
   }
 
   // Fetch a single player. RLS ensures the coach can only fetch
-  // players that are assigned to them. If they guess a URL for a
-  // player not on their roster, this will return `null`.
-  const { data: player, error } = await supabase
+  // players that are assigned to them.
+  const { data: player } = await supabase
     .from("players")
     .select("*")
     .eq("id", params.playerId)
     .single();
 
-  if (error || !player) {
+  // Fetch the latest pending questionnaire for this player
+  const { data: pendingResponse } = await supabase
+    .from('questionnaire_responses')
+    .select(`*, questionnaire_templates ( questions )`)
+    .eq('player_id', params.playerId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  // Fetch all completed questionnaire responses for this player
+  const { data: completedResponses } = await supabase
+    .from('questionnaire_responses')
+    .select(`*, questionnaire_templates ( questions )`)
+    .eq('player_id', params.playerId)
+    .eq('status', 'complete')
+    .order('created_at', { ascending: false });
+
+  // If the player doesn't exist or doesn't belong to the coach, RLS will return null.
+  if (!player) {
     return <p>Player not found or you do not have permission to view this profile.</p>;
   }
-
-  // A simple helper to render metric rows
-  const renderMetric = (label: string, value: string | null) => (
-    <div className="flex justify-between border-b py-2">
-      <span className="font-semibold">{label}</span>
-      <span>{value || 'N/A'}</span>
-    </div>
-  );
+  
+  // Helper array to render metrics cleanly
+  const metrics = [
+    { label: 'Resilience Profile', value: player.resilience_profile },
+    { label: 'Reliability', value: player.reliability },
+    { label: 'Self Belief', value: player.self_belief },
+    { label: 'Focus', value: player.focus },
+    { label: 'Adversity', value: player.adversity },
+    { label: 'Driver', value: player.driver },
+    { label: 'Coaching Style', value: player.coaching_style },
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">{player.first_name} {player.last_name}</h1>
-      <hr className="my-6" />
-
-      {/* Playbook Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Player Playbook</h2>
-        {player.playbook_url ? (
-          <Button asChild>
-            <a href={player.playbook_url} target="_blank" rel="noopener noreferrer">
-              Download Playbook PDF
-            </a>
-          </Button>
-        ) : player.playbook_text ? (
-          <div
-            className="prose dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: player.playbook_text }}
-          />
-        ) : (
-          <p>No playbook available.</p>
-        )}
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Player Header */}
+      <div>
+        <h1 className="text-4xl font-bold">{player.first_name} {player.last_name}</h1>
       </div>
 
-      {/* Metrics Section */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Player Metrics</h2>
-        <div className="space-y-2">
-          {renderMetric('Resilience Profile', player.resilience_profile)}
-          {renderMetric('Reliability', player.reliability)}
-          {renderMetric('Self Belief', player.self_belief)}
-          {renderMetric('Focus', player.focus)}
-          {renderMetric('Adversity', player.adversity)}
-          {renderMetric('Driver', player.driver)}
-          {renderMetric('Coaching Style', player.coaching_style)}
+      {/* Conditionally render the pending questionnaire form at the top if it exists */}
+      {pendingResponse && <QuestionnaireForm response={pendingResponse} />}
+
+      {/* Main Content Grid */}
+      <div className="grid md:grid-cols-3 gap-8">
+        {/* Left Column: Playbook */}
+        <div className="md:col-span-2 space-y-4">
+          <h2 className="text-2xl font-semibold border-b pb-2">Player Playbook</h2>
+          {player.playbook_url ? (
+            <Button asChild>
+              <a href={player.playbook_url} target="_blank" rel="noopener noreferrer">
+                Download Playbook PDF
+              </a>
+            </Button>
+          ) : player.playbook_text ? (
+            <div
+              className="prose dark:prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: player.playbook_text }}
+            />
+          ) : (
+            <p className="text-muted-foreground">No playbook available for this player.</p>
+          )}
+        </div>
+
+        {/* Right Column: Metrics */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold border-b pb-2">Player Metrics</h2>
+          <div className="space-y-2">
+            {metrics.map(metric => (
+              <div key={metric.label} className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">{metric.label}</span>
+                <Badge variant="secondary">{metric.value || 'N/A'}</Badge>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+      
+      {/* Conditionally render the answer history */}
+      {completedResponses && completedResponses.length > 0 && <AnswerHistory responses={completedResponses} />}
     </div>
   );
 }

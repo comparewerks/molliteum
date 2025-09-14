@@ -1,10 +1,11 @@
 // src/app/admin/(protected)/players/actions.ts
 "use server";
-
+import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Database } from '@/types/supabase';
+
 
 // Define a type alias for a player insert object from our generated types
 type PlayerInsert = Database['public']['Tables']['players']['Insert'];
@@ -83,4 +84,47 @@ export async function addPlayer(formData: FormData) {
 
   revalidatePath('/admin/players');
   redirect('/admin/players');
+}
+
+export async function saveQuestionnaireTemplate(questions: string[]) {
+  const supabase = createServerClient(); // <-- Use our helper function
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from('questionnaire_templates')
+    .insert({ questions: questions });
+
+  if (error) {
+    console.error("Error saving template:", error);
+    throw new Error(error.message);
+  }
+  
+  revalidatePath("/admin/questionnaire");
+}
+
+export async function submitQuestionnaire(formData: FormData) {
+  const supabase = createServerClient(); // <-- Use our helper function
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const responseId = formData.get('responseId') as string;
+  const answers = JSON.parse(formData.get('answers') as string);
+  const playerId = formData.get('playerId') as string;
+
+  if (!responseId || !answers || !playerId) {
+    throw new Error("Missing required form data.");
+  }
+
+  const { error } = await supabase
+    .from('questionnaire_responses')
+    .update({ answers: answers, status: 'complete' })
+    .eq('id', responseId);
+
+  if (error) {
+    console.error("Error submitting questionnaire:", error);
+    throw new Error(error.message);
+  }
+  
+  revalidatePath(`/dashboard/${playerId}`);
 }

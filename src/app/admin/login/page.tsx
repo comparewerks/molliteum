@@ -44,8 +44,12 @@ export default function AdminLoginPage() {
       router.refresh();
       router.push("/admin/coaches");
 
-    } catch (error: any) {
-      console.error("Authentication error:", error.message);
+        } catch (error) {
+      let errorMessage = "An unexpected error occurred.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Authentication error:", errorMessage);
       setError("Invalid email or password. Please try again.");
     }
   };

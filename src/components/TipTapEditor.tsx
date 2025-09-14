@@ -1,11 +1,11 @@
 // src/components/TiptapEditor.tsx
 "use client";
 
-import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, Strikethrough, List, ListOrdered, Heading2 } from 'lucide-react';
 import { Toggle } from './ui/toggle';
 import { useState } from 'react'; // ✨ 1. Import useState
+import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 
 export default function TiptapEditor({
   name,
@@ -49,7 +49,7 @@ export default function TiptapEditor({
 }
 
 // (TiptapToolbar component remains the same)
-const TiptapToolbar = ({ editor }: { editor: any | null }) => {
+const TiptapToolbar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null;
   }

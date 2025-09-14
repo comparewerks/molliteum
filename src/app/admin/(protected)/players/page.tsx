@@ -56,7 +56,7 @@ export default async function PlayersPage() {
               <TableRow key={player.id}>
                 <TableCell>{player.first_name} {player.last_name}</TableCell>
                 <TableCell>
-                  {/* @ts-ignore because Supabase types can be tricky with joins */}
+                  {/* @ts-expect-error Supabase join types can be complex */}
                   {player.profiles?.first_name} {player.profiles?.last_name}
                 </TableCell>
                 <TableCell>

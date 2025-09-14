@@ -24,10 +24,9 @@ export function DeleteCoachButton({ coachId }: { coachId: string }) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            coach's account and all their associated data.
-          </AlertDialogDescription>
+        <AlertDialogDescription>
+        This action cannot be undone. This will permanently delete the coach&apos;s account and all their associated data.
+        </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -28,9 +28,9 @@ export function InviteCoachDialog() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Invite Coach</DialogTitle>
-          <DialogDescription>
-            Enter the coach's details below. They will receive an invitation to set up their account.
-          </DialogDescription>
+        <DialogDescription>
+          Enter the coach&apos;s details below. They will receive an invitation to set up their account.
+        </DialogDescription>
         </DialogHeader>
         <form 
           ref={formRef}

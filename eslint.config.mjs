@@ -18,7 +18,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
-      "src/types/supabase.ts"
+      "src/types/supabase.ts",
+      "supabase/functions/assign-questionnaires/index.ts"
     ],
   },
 ];

@@ -44,7 +44,6 @@ export default async function CoachesPage() {
         <h1 className="text-2xl font-bold">Manage Coaches</h1>
         <div className="flex items-center gap-4">
           <InviteCoachDialog />
-          <LogoutButton />
         </div>
       </div>
 

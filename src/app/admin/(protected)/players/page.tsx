@@ -60,7 +60,9 @@ export default async function PlayersPage() {
                   {player.profiles?.first_name} {player.profiles?.last_name}
                 </TableCell>
                 <TableCell>
-                  {/* Edit/Delete buttons will go here */}
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/players/${player.id}/edit`}>Edit</Link>
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

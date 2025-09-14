@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 flex h-16 items-center border-b bg-background px-4 md:px-6 justify-between">
                 <Image
-                    src="/images/logo.avif" // Path to your logo
+                    src="/images/logo.png" // Path to your logo
                     alt="Company Logo"
                     width={150} // Adjust size for header
                     height={150}

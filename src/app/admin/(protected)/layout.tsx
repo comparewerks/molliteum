@@ -13,7 +13,7 @@ export default function AdminLayout({
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 justify-between">
         <nav className="flex-row gap-6 text-lg font-medium md:flex md:items-center md:gap-5 lg:gap-6">
         <Image
-            src="/images/logo.avif" // Path to your logo
+            src="/images/logo.png" // Path to your logo
             alt="Company Logo"
             width={150} // Adjust size for header
             height={150}

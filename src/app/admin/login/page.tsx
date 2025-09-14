@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import logo from "@/../public/images/logo.png";
 
 export default function AdminLoginPage() {
   // State hooks to store user input
@@ -59,7 +60,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Image
-            src='/images/logo.avif' // Path to your logo
+            src={logo} // Path to your logo
             alt="Company Logo"
             width={150} // Adjust width as needed
             height={50} // Adjust height as needed

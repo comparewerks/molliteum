@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import logo from "@/../public/images/logo.png";
 
 export default function CoachLoginPage() {
   const [email, setEmail] = useState("");
@@ -41,7 +42,7 @@ export default function CoachLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
         <Image
-            src='/images/logo.avif'
+            src={logo}
             alt="Company Logo"
             width={150}
             height={50}

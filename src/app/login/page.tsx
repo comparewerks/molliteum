@@ -24,7 +24,7 @@ export default function CoachLoginPage() {
       email: email,
       options: {
         // This is the URL the user will be redirected to after clicking the magic link.
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 

@@ -80,46 +80,39 @@ function AnswerHistory({ responses }: { responses: any[] }) {
 
 // The main page component
 export default async function PlayerProfilePage({
-  params,
+  params: { playerId }, // Destructure playerId directly from params
 }: {
   params: { playerId: string };
 }) {
   const supabase = createClient();
-
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
-  // Fetch a single player. RLS ensures the coach can only fetch
-  // players that are assigned to them.
+  // Now we use `playerId` directly instead of `params.playerId`
   const { data: player } = await supabase
     .from("players")
     .select("*")
-    .eq("id", params.playerId)
+    .eq("id", playerId) // <-- Use playerId
     .single();
 
-  // Fetch the latest pending questionnaire for this player
   const { data: pendingResponse } = await supabase
     .from('questionnaire_responses')
     .select(`*, questionnaire_templates ( questions )`)
-    .eq('player_id', params.playerId)
+    .eq('player_id', playerId) // <-- Use playerId
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
     .limit(1)
     .single();
 
-  // Fetch all completed questionnaire responses for this player
   const { data: completedResponses } = await supabase
     .from('questionnaire_responses')
     .select(`*, questionnaire_templates ( questions )`)
-    .eq('player_id', params.playerId)
+    .eq('player_id', playerId) // <-- Use playerId
     .eq('status', 'complete')
     .order('created_at', { ascending: false });
 
-  // If the player doesn't exist or doesn't belong to the coach, RLS will return null.
   if (!player) {
-    return <p>Player not found or you do not have permission to view this profile.</p>;
+    return <p>Player not found or you do not have permission.</p>;
   }
   
   // Helper array to render metrics cleanly

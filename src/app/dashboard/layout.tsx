@@ -13,8 +13,8 @@ export default function DashboardLayout({
                 <Image
                     src="/images/logo.avif" // Path to your logo
                     alt="Company Logo"
-                    width={40} // Adjust size for header
-                    height={40}
+                    width={150} // Adjust size for header
+                    height={150}
                     className="mr-2"
                   />
         <h1 className="text-lg font-semibold">Player Portal</h1>

@@ -15,8 +15,8 @@ export default function AdminLayout({
         <Image
             src="/images/logo.avif" // Path to your logo
             alt="Company Logo"
-            width={40} // Adjust size for header
-            height={40}
+            width={150} // Adjust size for header
+            height={150}
             className="mr-2"
           />
           <Link href="/admin/coaches" className="text-muted-foreground transition-colors hover:text-foreground">

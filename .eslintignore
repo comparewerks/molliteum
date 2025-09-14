@@ -1,0 +1,5 @@
+# Ignore the auto-generated Supabase types file
+src/types/supabase.ts
+
+# Ignore Next.js build directory
+.next

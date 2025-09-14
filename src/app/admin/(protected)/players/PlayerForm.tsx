@@ -46,7 +46,7 @@ export default function PlayerForm({
     player?.playbook_url ? 'pdf' : 'text'
   );
   
-  const [metricValues, setMetricValues] = useState<{ [key: string]: string }>(() => {
+  const [metricValues, setMetricValues] = useState<{ [key: string]: string }>((): { [key: string]: string } => {
     if (!player) return {};
     return {
       resilience_profile: player.resilience_profile || '',

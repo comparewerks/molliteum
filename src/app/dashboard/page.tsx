@@ -45,7 +45,12 @@ export default async function DashboardPage() {
           ))}
         </div>
       ) : (
-        <p>You have not been assigned any players yet.</p>
+        <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed rounded-lg">
+          <h2 className="text-xl font-semibold">No Players Found</h2>
+          <p className="text-muted-foreground mt-2">
+            You have not been assigned any players yet. Please contact Molliteum support.
+          </p>
+        </div>
       )}
     </div>
   );

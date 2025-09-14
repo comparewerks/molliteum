@@ -7,18 +7,24 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession()
   const pathname = request.nextUrl.pathname
 
-  // List of all public routes
   const publicRoutes = ['/login', '/admin/login'];
 
-  // If user is not signed in and is trying to access a protected route
+  // If user is not signed in and is trying to access a protected route, redirect
   if (!session && !publicRoutes.includes(pathname) && !pathname.startsWith('/auth/callback')) {
     const url = pathname.startsWith('/admin') ? '/admin/login' : '/login';
     return NextResponse.redirect(new URL(url, request.url));
   }
   
-  // If user is signed in and tries to access a public login page
+  // If user is signed in, handle redirects away from login pages
   if (session && publicRoutes.includes(pathname)) {
-    // We can add role-based redirects here later if needed (admin vs coach)
+    const userRole = session.user.user_metadata?.role;
+
+    // Redirect admins to the admin section
+    if (userRole === 'admin') {
+      return NextResponse.redirect(new URL('/admin/coaches', request.url));
+    }
+    
+    // Redirect coaches (or anyone else) to the coach dashboard
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

@@ -29,10 +29,10 @@ export default function CoachLoginPage() {
     });
 
     if (error) {
-      console.error("Error sending magic link:", error);
-      setError("Could not send magic link. Please try again.");
+      console.error("Error sending log in link:", error);
+      setError("Could not send log in link. Please try again.");
     } else {
-      setMessage("Magic link sent! Please check your email.");
+      setMessage("Log in link sent! Please check your email.");
     }
   };
 
@@ -41,11 +41,11 @@ export default function CoachLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
         <Image
-            src="/images/logo.avif" // Path to your logo
+            src="/images/logo.avif"
             alt="Company Logo"
-            width={150} // Adjust width as needed
-            height={50} // Adjust height as needed
-            className="mx-auto mb-4" // Center the logo
+            width={150}
+            height={50}
+            className="mx-auto mb-4"
           />
           <CardTitle className="text-2xl">Coach Portal</CardTitle>
           <CardDescription>

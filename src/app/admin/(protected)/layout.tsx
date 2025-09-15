@@ -41,6 +41,7 @@ export default function AdminLayout({
           />
           {navLink("/admin/coaches", "Coaches")}
           {navLink("/admin/players", "Players")}
+          {navLink("/admin/questionnaire", "Questionnaire")}
         </nav>
         <LogoutButton />
       </header>

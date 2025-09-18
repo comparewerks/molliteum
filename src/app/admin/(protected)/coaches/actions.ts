@@ -1,68 +1,78 @@
-// src/app/admin/coaches/actions.ts
+// src/app/admin/(protected)/coaches/actions.ts
 "use server";
 
-import { createClient } from "@/lib/supabase/server"; // Use the server client for user session
-import { createClient as createAdminClient } from '@supabase/supabase-js' // Use the vanilla client for admin
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { revalidatePath } from "next/cache";
+// Note: We are not redirecting from this action anymore
 
-export async function inviteCoach(formData: FormData) {
-  // Use the regular server client to check if the current user is an admin
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+// Keep this type for our return values
+type ActionResult = {
+  success: boolean;
+  message: string;
+};
 
-  if (!user) {
-    throw new Error("You must be logged in to invite a coach.");
-  }
-  
-  // You would ideally check if user has an 'admin' role from your profiles table here
-  // For now, we'll assume any logged-in user on this page is an admin.
-  
+export async function inviteCoach(formData: FormData): Promise<ActionResult> {
   const firstName = formData.get("firstName") as string;
   const lastName = formData.get("lastName") as string;
   const email = formData.get("email") as string;
+  const organizationName = formData.get("organization") as string; // We'll add this to the form
 
-  if (!email || !firstName || !lastName) {
-    throw new Error("First name, last name, and email are required.");
+  if (!email || !firstName || !lastName || !organizationName) {
+    return { success: false, message: "All fields are required." };
   }
   
-  // Use the ADMIN client to create a user. This requires the service_role key.
   const supabaseAdmin = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
   
-  // Create the user in Supabase Auth
-  const { data: newUserData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-    email: email,
-    email_confirm: true, // You can set this to false to not require email confirmation
-    user_metadata: {
-      role: 'coach',
-      first_name: firstName,
-      last_name: lastName
+  // Use the inviteUserByEmail function
+  const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+    email,
+    {
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        role: 'coach',
+      },
+      // This is the page the user will be sent to AFTER they click the invite link
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm`,
     }
-  });
+  );
 
-  if (authError) {
-    console.error("Error creating user:", authError);
-    throw new Error(authError.message);
+  if (inviteError || !inviteData.user) {
+    console.error("Error inviting user:", inviteError);
+    return { success: false, message: inviteError?.message || "Failed to send invitation." };
   }
   
-  // Our trigger `handle_new_user` will automatically create the profile.
-  // We just need to update it with the first and last name.
+  // Now, find or create the organization and update the user's profile
+  // This is a "find or create" operation
+  const { data: org, error: orgError } = await supabaseAdmin
+    .from('organizations')
+    .upsert({ name: organizationName }, { onConflict: 'name' })
+    .select()
+    .single();
+
+  if (orgError || !org) {
+      console.error("Error with organization:", orgError);
+      return { success: false, message: "Could not find or create organization." };
+  }
+
+  // Update the user's profile with the new details
   const { error: profileError } = await supabaseAdmin
     .from('profiles')
-    .update({ first_name: firstName, last_name: lastName })
-    .eq('id', newUserData.user.id);
+    .update({ first_name: firstName, last_name: lastName, organization_id: org.id })
+    .eq('id', inviteData.user.id);
     
   if (profileError) {
     console.error("Error updating profile:", profileError);
-    // You might want to delete the auth user here to clean up
-    throw new Error(profileError.message);
+    return { success: false, message: "Invitation sent, but failed to update profile." };
   }
 
-  // Revalidate the path to refresh the coach list on the page
   revalidatePath("/admin/coaches");
+  return { success: true, message: "Invitation sent successfully!" };
 }
+
 export async function deleteCoach(userId: string) {
   if (!userId) {
     throw new Error("User ID is required.");
@@ -73,6 +83,9 @@ export async function deleteCoach(userId: string) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Deleting the user from Supabase Auth will automatically
+  // delete their corresponding row in our `profiles` table
+  // because we set up "ON DELETE CASCADE" in our database schema.
   const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
   if (error) {

@@ -1,28 +1,29 @@
-// src/app/dashboard/layout.tsx
-import LogoutButton from "@/components/CoachLogoutButton";
-import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import SidebarLayout from "@/components/SidebarLayout";
+import { Home } from "lucide-react";
 
-export default function DashboardLayout({
+// Define the navigation items specifically for the coach portal
+const coachNavItems = [
+  { href: "/dashboard", label: "Players", iconName: "Home" },
+];
+
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      <header className="sticky top-0 flex h-16 items-center border-b bg-background px-4 md:px-6 justify-between">
-                <Image
-                    src="/images/logo.png" // Path to your logo
-                    alt="Company Logo"
-                    width={150} // Adjust size for header
-                    height={150}
-                    className="mr-2"
-                  />
-        <h1 className="text-lg font-semibold">Player Portal</h1>
-        <LogoutButton />
-      </header>
-      <main className="flex-1 p-4 md:p-8">
-        {children}
-      </main>
-    </div>
+    <SidebarLayout
+      user={user}
+      navItems={coachNavItems}
+      headerTitle="Coach Portal"
+      logoHref="/dashboard"
+      logoutRedirectTo="/login"
+    >
+      {children}
+    </SidebarLayout>
   );
 }

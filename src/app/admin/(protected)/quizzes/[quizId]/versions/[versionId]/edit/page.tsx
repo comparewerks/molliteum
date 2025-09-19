@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { QuizBuilder } from "./QuizBuilder";
-import { DeleteVersionButton } from "../DeleteVersionButton"; 
-import { DeleteQuizButton } from "../DeleteQuizButton";
+import { DeleteVersionButton } from "../../../../DeleteVersionButton"; 
+import { DeleteQuizButton } from "../../../../DeleteQuizButton";
 
 export const dynamic = 'force-dynamic';
 

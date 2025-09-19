@@ -23,11 +23,11 @@ const iconMap = {
 }
 
 // The type for a navigation item, accepting a string for the icon name
-type NavItem = {
-  href: string
-  label: string
-  iconName: keyof typeof iconMap
-}
+export type NavItem = {
+  href: string;
+  label: string;
+  iconName: keyof typeof iconMap;
+};
 
 // The type for all props the layout component accepts
 type SidebarLayoutProps = {

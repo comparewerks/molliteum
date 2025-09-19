@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import SidebarLayout from "@/components/SidebarLayout";
+import SidebarLayout, { type NavItem } from "@/components/SidebarLayout";
 import { Home } from "lucide-react";
 
 // Define the navigation items specifically for the coach portal
-const coachNavItems = [
+const coachNavItems: NavItem[] = [
   { href: "/dashboard", label: "Players", iconName: "Home" },
 ];
 

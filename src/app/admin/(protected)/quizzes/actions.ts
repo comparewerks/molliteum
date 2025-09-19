@@ -5,6 +5,19 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+type QuizData = {
+  questions: {
+    id: string;
+    text: string;
+    metric: string;
+    choices: {
+      id: string;
+      text: string;
+      value: number;
+    }[];
+  }[];
+};
+
 export async function createQuiz(formData: FormData) {
   const supabase = createClient();
   const name = formData.get("name") as string;
@@ -47,6 +60,8 @@ export async function createQuiz(formData: FormData) {
   // Redirect the user directly to the new quiz's edit page
   redirect(`/admin/quizzes/${quiz.id}`);
 }
+
+
 
 export async function setActiveVersion(quizId: string, versionId: string) {
   const supabase = createClient();

@@ -7,7 +7,8 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession()
   const pathname = request.nextUrl.pathname
 
-  const publicRoutes = ['/login', '/admin/login'];
+  // ✅ FIX: Add the invitation confirmation route to your public routes
+  const publicRoutes = ['/login', '/admin/login', '/auth/confirm'];
 
   // If user is not signed in and is trying to access a protected route, redirect
   if (!session && !publicRoutes.includes(pathname) && !pathname.startsWith('/auth/callback')) {

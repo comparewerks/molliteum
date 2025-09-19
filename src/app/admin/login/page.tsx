@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@molliteum.com"
+                placeholder="Email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
               <Input 
                 id="password" 
                 type="password"
-                placeholder="••••••••"
+                placeholder="Password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

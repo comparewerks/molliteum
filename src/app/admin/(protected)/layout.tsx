@@ -27,7 +27,7 @@ export default async function AdminLayout({
     <SidebarLayout
       user={user}
       navItems={adminNavItems}
-      headerTitle="Admin Panel"
+      headerTitle={"Admin Panel"}
       logoHref="/admin/coaches"
       logoutRedirectTo="/admin/login"
     >

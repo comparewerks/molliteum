@@ -22,7 +22,7 @@ export function DeleteQuizButton({ quizId, quizName }: { quizId: string, quizNam
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete "{quizName}"?</AlertDialogTitle>
+          <AlertDialogTitle>Delete &quot;{quizName}&quot;?</AlertDialogTitle>
           <AlertDialogDescription>
             This action is permanent and will delete this quiz and ALL of its versions. Are you absolutely sure?
           </AlertDialogDescription>

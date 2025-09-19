@@ -124,7 +124,7 @@ export default function CoachLoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)} required 
-              placeholder="email@yourcompany.com"
+              placeholder="Email"
               />
             </div>
             <div className="space-y-2">
@@ -134,7 +134,7 @@ export default function CoachLoginPage() {
               type="password" 
               value={password} onChange={(e) => setPassword(e.target.value)} 
               required 
-              placeholder="●●●●●●●●"
+              placeholder="Password"
               />
             </div>
             {error && <p className="text-sm text-red-500 text-center">{error}</p>}

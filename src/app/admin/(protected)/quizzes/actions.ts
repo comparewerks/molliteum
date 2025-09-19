@@ -177,7 +177,7 @@ export async function updateCoachAccess(versionId: string, assignedCoachIds: str
   revalidatePath(`/admin/quizzes/[quizId]`, 'page');
 }
 
-export async function updateQuizVersionData(versionId: string, quizData: any) {
+export async function updateQuizVersionData(versionId: string, quizData: QuizData) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");

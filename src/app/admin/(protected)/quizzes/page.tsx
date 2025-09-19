@@ -45,9 +45,9 @@ export default async function QuizzesPage() {
                 <Card className="hover:border-primary transition-colors">
                   <CardHeader>
                     <CardTitle>{quiz.name}</CardTitle>
-                    <CardDescription>
-                      {activeVersion ? `v${activeVersion.version_number} is active` : "No active version"}
-                    </CardDescription>
+                      <CardDescription>
+                        {activeVersion ? `v${activeVersion.version_number} is active` : "No active version"}
+                      </CardDescription>
                   </CardHeader>
                   <CardContent className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Administered</span>
@@ -62,7 +62,7 @@ export default async function QuizzesPage() {
         <div className="text-center p-8 border-2 border-dashed rounded-lg">
           <h2 className="text-xl font-semibold">No Quizzes Found</h2>
           <p className="text-muted-foreground mt-2">
-            Click "Create New Quiz" to get started.
+            Click &quot;Create New Quiz&quot; to get started.
           </p>
         </div>
       )}

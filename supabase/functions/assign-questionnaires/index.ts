@@ -1,7 +1,7 @@
 // supabase/functions/assign-questionnaires/index.ts
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 // It's a good practice to define the structure of your data.
 // You can generate these automatically with `supabase gen types typescript > types.ts`
